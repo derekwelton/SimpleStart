@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	  <PackageId>SimpleStart.Auth.Firebase</PackageId>
+	  <Version>0.0.1</Version>
+	  <Authors>Derek Welton</Authors>
+	  <RepositoryUrl>https://github.com/derekwelton/SimpleStart</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/derekwelton/SimpleStart</PackageProjectUrl>
+	  <Description>A wrapper over FirebaseAdmin to easily implement firebase authentication on the server.</Description>
+	  <PackageTags>firebase auth firebaseadmin</PackageTags>
+	  <Title>Simple Start Auth Firebase</Title>
+	  <RepositoryType>git</RepositoryType>
+	  <IncludeSymbols>True</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Folder Include="Extensions\" />
+	  <Folder Include="Handlers\" />
+	  <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\SimpleStart.Core\SimpleStart.Core.csproj" />
+  </ItemGroup>
+
+</Project>

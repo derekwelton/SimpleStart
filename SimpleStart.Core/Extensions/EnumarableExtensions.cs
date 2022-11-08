@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SimpleStart.Core.Entities;
+using SimpleStart.Core.Models;
 
 namespace SimpleStart.Core.Extensions
 {

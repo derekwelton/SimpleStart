@@ -14,37 +14,73 @@ namespace SimpleStart.Core.Extensions
             {
                 string s => !string.IsNullOrWhiteSpace(s),
                 double d => d > 0,
+                decimal d => d > 0,
                 int i => i > 0,
                 _ => value != null
             };
         }
-        public static string ToStringValue(this object value)
+        public static string TryToString(this object value)
         {
             try
             {
                 if (value == null) return string.Empty;
-                return value.ToString();
+                return Convert.ToString(value);
             }
             catch
             {
                 return string.Empty;
             }
         }
-        public static double ToDoubleValue(this object value)
+        public static double TryToDouble(this object value)
         {
-            return value.ToStringValue().ToDouble();
+            try
+            {
+                if (value == null) return 0;
+                return Convert.ToDouble(value);
+            }
+            catch
+            {
+                return 0;
+            }
+            
         }
-        public static int ToIntValue(this object value)
+        public static decimal TryToDecimal(this object value)
         {
-            return value.ToStringValue().ToInt();
+            try
+            {
+                return value == null ? 0 : Convert.ToDecimal(value);
+            }
+            catch
+            {
+                return 0;
+            }
+            
         }
-        public static bool ToBoolValue(this object value)
+        public static int TryToInt(this object value)
         {
-            return value.ToStringValue().ToBool();
+            try
+            {
+                return value == null ? 0 : Convert.ToInt32(value);
+            }
+            catch
+            {
+                return 0;
+            }
         }
-        public static DateTime ToDateTimeValue(this object value)
+        public static bool TryToBool(this object value)
         {
-            return value.ToStringValue().ToDateTime();
+            return value != null && value.TryToString().ToBool();
+        }
+        public static DateTime TryToDateTime(this object value)
+        {
+            try
+            {
+                return value == null ? DateTime.MinValue : Convert.ToDateTime(value);
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
         }
     }
 }

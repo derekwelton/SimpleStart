@@ -6,32 +6,23 @@ public static class StringExtensions
 {
     public static int ToInt(this string value)
         {
-            if (string.IsNullOrEmpty(value)) return 0;
-            try
-            {
-                int.TryParse(value, out int output);
-                return output;
-            }
-            catch
-            {
-                return 0;
-            }
-
+            int.TryParse(value, out var output);
+            return output;
         }
     public static double ToDouble(this string value)
         {
             if (string.IsNullOrEmpty(value)) return 0;
-            try
-            {
-                double.TryParse(value, out double output);
-                return output;
-            }
-            catch
-            {
-                return 0;
-            }
+            double.TryParse(value, out var output);
+            return output;
 
         }
+    public static decimal ToDecimal(this string value)
+    {
+        if (string.IsNullOrEmpty(value)) return 0;
+        decimal.TryParse(value, out var output);
+        return output;
+
+    }
     public static bool ToBool(this string value)
         {
             if (string.IsNullOrWhiteSpace(value)) return false;
@@ -43,16 +34,8 @@ public static class StringExtensions
     public static DateTime ToDateTime(this string value)
         {
             if (string.IsNullOrWhiteSpace(value)) return DateTime.MinValue;
-
-            try
-            {
-                DateTime.TryParse(value, out DateTime output);
-                return output;
-            }
-            catch
-            {
-                return DateTime.MinValue;
-            }
+            DateTime.TryParse(value, out DateTime output);
+            return output;
         }
     public static double ConvertFractionToDouble(this string input)
         {

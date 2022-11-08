@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SimpleStart.Core.Entities
+namespace SimpleStart.Core.Models
 {
     public sealed class PagedList<T>
     {
