@@ -3,15 +3,22 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>10</LangVersion>
+	    <Nullable>enable</Nullable>
     </PropertyGroup>
     
     <PropertyGroup>
         <PackageId>SimpleStart.Core</PackageId>
-        <Version>0.0.1</Version>
+        <Version>0.0.4</Version>
         <Authors>Derek Welton</Authors>
         <RepositoryUrl>https://github.com/derekwelton/SimpleStart</RepositoryUrl>
         <PackageProjectUrl>https://github.com/derekwelton/SimpleStart</PackageProjectUrl>
         <Description>Simple utility library that I find myself using all the time. This contains simple conversion conversion APIs, Keyboard Macros, and Crypto.</Description>
+	    <PackageTags>simplestart</PackageTags>
+	    <Title>Simple Start Core</Title>
+	    <RepositoryType>git</RepositoryType>
+	    <IncludeSymbols>True</IncludeSymbols>
+	    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
 </Project>

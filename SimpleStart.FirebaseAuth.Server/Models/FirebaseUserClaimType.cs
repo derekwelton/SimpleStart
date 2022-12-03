@@ -2,8 +2,8 @@
 
 public static class FirebaseUserClaimType
 {
-    public const string ID = "id";
-    public const string EMAIL = "email";
-    public const string USERNAME = "username";
-    public const string EMAIL_VERIFIED = "email_verified";
+    public const string Id = "id";
+    public const string Email = "email";
+    public const string Username = "username";
+    public const string EmailVerified = "email_verified";
 }

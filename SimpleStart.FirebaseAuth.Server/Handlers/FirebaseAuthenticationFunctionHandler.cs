@@ -13,7 +13,7 @@ namespace SimpleStart.Auth.Firebase.Handlers;
 
 public class FirebaseAuthenticationFunctionHandler
 {
-    private const string BEARER_PREFIX = "Bearer ";
+    private const string BearerPrefix = "Bearer ";
     private readonly FirebaseApp _firebaseApp;
 
     public FirebaseAuthenticationFunctionHandler(FirebaseApp firebaseApp)
@@ -24,17 +24,17 @@ public class FirebaseAuthenticationFunctionHandler
     public async Task<AuthenticateResult> HandleAuthenticateAsync(HttpContext context)
     {
         //Validate "Authorization" claim exist
-        if(context.Request.Headers.ContainsKey("Authorization")) return AuthenticateResult.NoResult();
+        if(context.Request.Headers.ContainsKey("Authorization") == false) return AuthenticateResult.NoResult();
 
         //Make sure "Authorization" claim has a valid Value
         string bearerToken = context.Request.Headers["Authorization"];
-        if(string.IsNullOrEmpty(bearerToken) || bearerToken.StartsWith(BEARER_PREFIX) == false) return AuthenticateResult.Fail("Invalid Schema");
+        if(string.IsNullOrEmpty(bearerToken) || bearerToken.StartsWith(BearerPrefix) == false) return AuthenticateResult.Fail("Invalid Schema");
 
-        string token = bearerToken.Substring(BEARER_PREFIX.Length); //gets just the token and removes the bearer prefix
+        string token = bearerToken.Substring(BearerPrefix.Length); //gets just the token and removes the bearer prefix
 
         try
         {
-            var firebaseClient = FirebaseAdmin.Auth.FirebaseAuth.GetAuth(_firebaseApp); //get the client
+            var firebaseClient = FirebaseAdmin.Auth.FirebaseAuth.GetAuth(_firebaseApp); //get the firebase client
             var firebaseToken = await firebaseClient.VerifyIdTokenAsync(token); //verify Token
 
             return AuthenticateResult.Success(CreateAuthenticationTicket(firebaseToken));
@@ -46,7 +46,7 @@ public class FirebaseAuthenticationFunctionHandler
         catch (Exception ex)
         {
             //if this happens, its because the FirebaseAdmin api is not working or the network is down.
-            throw new Exception("Failed to verify firebase Token", ex);
+            throw new Exception("Failed to verify firebase Token. Failed to access the Firebase Api or the network is down.", ex);
         }
     }
 
@@ -63,10 +63,10 @@ public class FirebaseAuthenticationFunctionHandler
 
         foreach (var item in source)
         {
-            if(item.Key == "user_id") claims.Add(new Claim(FirebaseUserClaimType.ID,item.Value.ToString() ?? string.Empty));
-            else if(item.Key == "email") claims.Add(new Claim(FirebaseUserClaimType.EMAIL,item.Value.ToString() ?? string.Empty));
-            else if(item.Key == "email_verified") claims.Add(new Claim(FirebaseUserClaimType.EMAIL_VERIFIED,item.Value.ToString() ?? string.Empty));
-            else if(item.Key == "name") claims.Add(new Claim(FirebaseUserClaimType.USERNAME,item.Value.ToString() ?? string.Empty));
+            if(item.Key == "user_id") claims.Add(new Claim(FirebaseUserClaimType.Id,item.Value.ToString() ?? string.Empty));
+            else if(item.Key == "email") claims.Add(new Claim(FirebaseUserClaimType.Email,item.Value.ToString() ?? string.Empty));
+            else if(item.Key == "email_verified") claims.Add(new Claim(FirebaseUserClaimType.EmailVerified,item.Value.ToString() ?? string.Empty));
+            else if(item.Key == "name") claims.Add(new Claim(FirebaseUserClaimType.Username,item.Value.ToString() ?? string.Empty));
             else claims.Add(new Claim(item.Key,item.Value.ToString() ?? string.Empty));
         }
 

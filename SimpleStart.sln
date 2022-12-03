@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5B5E327B-4C4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStart.Core", "SimpleStart.Core\SimpleStart.Core.csproj", "{D2659063-41C1-4BD2-8C96-0EB21F7B9968}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleStart.Auth.Firebase", "SimpleStart.FirebaseAuth.Server\SimpleStart.Auth.Firebase.csproj", "{03231F6C-76F0-4E2A-857D-5A5A69606463}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStart.Auth.Firebase", "SimpleStart.FirebaseAuth.Server\SimpleStart.Auth.Firebase.csproj", "{03231F6C-76F0-4E2A-857D-5A5A69606463}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
