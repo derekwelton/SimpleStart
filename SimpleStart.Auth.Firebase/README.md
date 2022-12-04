@@ -3,8 +3,13 @@ This is a wrapper over "FirebaseAmin" but its simplified to implement for your a
 
 ## Dependencies
 - FirebaseAdmin (the official firebase admin sdk provided by Google)
-- Fluent Email (used to send password recovery)
+- Fluent Email (used to send password recovery emails)
 - Microsoft.AspNetCore.Authentication.JwtBearer (used to add authentication and dependency injection)
+
+## Install
+```bash
+dotnet add package SimpleStart.Auth.Firebase --version 0.0.5
+```
 
 ## Getting Started
 
@@ -45,9 +50,9 @@ builder.Services.AddAuthorization();
 
 #### Create Root Admin
 ```csharp
-app.MapGet("/createadmin", async ([FromServices] FirebaseUserStore userStore) =>
+app.MapGet("/createadmin", async ([FromServices] FirebaseUserManager firebaseManager) =>
 {
-    await userStore.TryCreateRootAdmin("admin@example.com", "secretPassword");
+    await firebaseManager.TryCreateRootAdmin("admin@example.com", "secretPassword");
     Results.Ok();
     
 }).AllowAnonymous();
@@ -55,7 +60,7 @@ app.MapGet("/createadmin", async ([FromServices] FirebaseUserStore userStore) =>
 
 #### Register user
 ```csharp
-app.MapGet("/registerUser", async ([FromServices] FirebaseUserStore userStore) =>
+app.MapGet("/registerUser", async ([FromServices] FirebaseUserManager firebaseManager) =>
 {
     var user = new FirebaseUser
     {
@@ -67,7 +72,7 @@ app.MapGet("/registerUser", async ([FromServices] FirebaseUserStore userStore) =
         PhoneNumber = "+12345678900"
     };
 
-    await userStore.RegisterUserAsync(user,"secretpassword");
+    await firebaseManager.RegisterUserAsync(user,"secretpassword");
     Results.Ok();
     
 }).AllowAnonymous();
@@ -75,9 +80,9 @@ app.MapGet("/registerUser", async ([FromServices] FirebaseUserStore userStore) =
 
 #### Get Password Reset Link
 ```csharp
-app.MapGet("/passwordreset", async ([FromServices] FirebaseUserStore userStore, string email) =>
+app.MapGet("/passwordreset", async ([FromServices] FirebaseUserManager firebaseManager, string email) =>
 {
-    var link = await userStore.GetPasswordResetLinkAsync(email);
+    var link = await firebaseManager.GetPasswordResetLinkAsync(email);
 
     Results.Ok(link);
 });
@@ -85,10 +90,10 @@ app.MapGet("/passwordreset", async ([FromServices] FirebaseUserStore userStore, 
 
 #### Retrieve Firebase User
 ```csharp
-app.MapGet("/getuser", async (HttpContext context, [FromServices] FirebaseUserStore userStore) =>
+app.MapGet("/getuser", async (HttpContext context, [FromServices] FirebaseUserManager firebaseManager) =>
 {
-    var getUserByEmail = await userStore.GetAuthUserByEmailAsync("user@example.com");
-    var getUserById = await userStore.GetAuthUserByIdAsync("abcd-1234");
+    var getUserByEmail = await firebaseManager.GetAuthUserByEmailAsync("user@example.com");
+    var getUserById = await firebaseManager.GetAuthUserByIdAsync("abcd-1234");
 
     var getAuthenticatedUserFromContext = context.GetFirebaseUser();
 
@@ -98,9 +103,9 @@ app.MapGet("/getuser", async (HttpContext context, [FromServices] FirebaseUserSt
 
 #### Revoke Token
 ```csharp
-app.MapGet("/RevokeToken", async (HttpContext context, [FromServices] FirebaseUserStore userStore, string userId) =>
+app.MapGet("/RevokeToken", async (HttpContext context, [FromServices] FirebaseUserManager firebaseManager, string userId) =>
 {
-    await userStore.RevokeAllTokensAsync(userId);
+    await firebaseManager.RevokeAllTokensAsync(userId);
 
     Results.Ok();
 });
@@ -108,22 +113,22 @@ app.MapGet("/RevokeToken", async (HttpContext context, [FromServices] FirebaseUs
 
 #### Update Firebase User
 ```csharp
-app.MapGet("/update", async ([FromServices] FirebaseUserStore userStore, string userId) =>
+app.MapGet("/update", async ([FromServices] FirebaseUserManager firebaseManager, string userId) =>
 {
     //update email
-    await userStore.UpdateEmailAsync(userId, "newemail@example.com");
+    await firebaseManager.UpdateEmailAsync(userId, "newemail@example.com");
 
     //update Disabled
-    await userStore.UpdateDisabledAsync(userId, true);
+    await firebaseManager.UpdateDisabledAsync(userId, true);
 
     //update Display name
-    await userStore.UpdateDisplayNameAsync(userId, "New Display name");
+    await firebaseManager.UpdateDisplayNameAsync(userId, "New Display name");
 
     //update Photo Url
-    await userStore.UpdatePhotoUrlAsync(userId, "http://example.com/newimage.png");
+    await firebaseManager.UpdatePhotoUrlAsync(userId, "http://example.com/newimage.png");
 
     //update Password
-    await userStore.UpdatePasswordAsync(userId, "newpassword");
+    await firebaseManager.UpdatePasswordAsync(userId, "newpassword");
 
     //updates all fields of the user.
     //Note: this will replace all fields, so if you pass an empty string, the value will be empty
@@ -136,7 +141,7 @@ app.MapGet("/update", async ([FromServices] FirebaseUserStore userStore, string 
         Disabled = false, //allows the user login to firebase auth
         PhoneNumber = "+12345678900"
     };
-    await userStore.UpdateUserAsync(user);
+    await firebaseManager.UpdateUserAsync(user);
 
     Results.Ok();
 });

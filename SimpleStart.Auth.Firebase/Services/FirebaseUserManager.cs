@@ -9,14 +9,14 @@ using SimpleStart.Auth.Firebase.Models;
 
 namespace SimpleStart.Auth.Firebase.Services;
 
-public class FirebaseUserStore
+public class FirebaseUserManager
 {
     private readonly FirebaseApp _firebaseApp;
     private readonly FirebaseEmailProvider _emailProvider;
     private readonly FirebaseAuthConfigOptions _firebaseConfig;
     private FirebaseAuth _firebaseClient => FirebaseAuth.GetAuth(_firebaseApp);
 
-    public FirebaseUserStore(FirebaseApp firebaseApp, FirebaseEmailProvider emailProvider, IOptions<FirebaseAuthConfigOptions> options)
+    public FirebaseUserManager(FirebaseApp firebaseApp, FirebaseEmailProvider emailProvider, IOptions<FirebaseAuthConfigOptions> options)
     {
         _firebaseApp = firebaseApp;
         _emailProvider = emailProvider;

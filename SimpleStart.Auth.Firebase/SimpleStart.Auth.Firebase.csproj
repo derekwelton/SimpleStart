@@ -4,13 +4,13 @@
     <TargetFramework>net7.0</TargetFramework>
 	  <Nullable>enable</Nullable>
 	  <PackageId>SimpleStart.Auth.Firebase</PackageId>
-	  <Version>0.0.5</Version>
+	  <Version>0.1.0</Version>
 	  <Authors>Derek Welton</Authors>
-	  <RepositoryUrl>https://github.com/derekwelton/SimpleStart</RepositoryUrl>
-	  <PackageProjectUrl>https://github.com/derekwelton/SimpleStart</PackageProjectUrl>
-	  <Description>A wrapper over FirebaseAdmin to easily implement firebase authentication on the server.</Description>
+	  <RepositoryUrl>https://github.com/derekwelton/SimpleStart/tree/main/SimpleStart.FirebaseAuth.Server</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/derekwelton/SimpleStart/tree/main/SimpleStart.FirebaseAuth.Server</PackageProjectUrl>
+	  <Description>This is a wrapper over "FirebaseAmin" to simplify using firebase for authentication.</Description>
 	  <PackageTags>firebase auth firebaseadmin</PackageTags>
-	  <Title>Simple Start Auth Firebase</Title>
+	  <Title>Simple Start Firebase Authentication</Title>
 	  <RepositoryType>git</RepositoryType>
 	  <IncludeSymbols>True</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -26,7 +26,6 @@
   <ItemGroup>
 	  <Folder Include="Extensions\" />
 	  <Folder Include="Handlers\" />
-	  <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

@@ -13,18 +13,39 @@ namespace SimpleStart.Auth.Firebase;
 
 public static class DependencyInjection
 {
+    /// <summary>
+    /// Adds firebase authentication and registers all needed services. You will not be able to send emails.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection AddFirebaseAuthentication(this IServiceCollection services)
     {
         services.AddSingleton<FirebaseEmailProvider>(new FirebaseEmailProvider(new Email()));
         services.Configure<FirebaseAuthConfigOptions>(option => {});
         return services.AddFirebaseServices();
     }
+    /// <summary>
+    /// Adds firebase authentication and registers all needed services. It grabs the email configuration from appsettings.json
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
     public static IServiceCollection AddFirebaseAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<FirebaseEmailProvider>();
         services.ConfigureEmailService(configuration);
         return services.AddFirebaseServices();
     }
+    /// <summary>
+    /// Adds firebase authentication and registers all needed services. Passes email configuration as parameters.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="authEmailAddress"></param>
+    /// <param name="sendGridApiKey"></param>
+    /// <param name="fromName"></param>
+    /// <param name="registerSubject"></param>
+    /// <param name="resetPasswordSubject"></param>
+    /// <returns></returns>
     public static IServiceCollection AddFirebaseAuthentication(this IServiceCollection services, string authEmailAddress, string sendGridApiKey, string fromName, string registerSubject, string resetPasswordSubject)
     {
         services.AddSingleton<FirebaseEmailProvider>();
@@ -36,7 +57,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddFirebaseServices(this IServiceCollection services)
     {
-        services.AddSingleton<FirebaseUserStore>();
+        services.AddSingleton<FirebaseUserManager>();
         services.AddSingleton(FirebaseApp.Create());
 
         services
