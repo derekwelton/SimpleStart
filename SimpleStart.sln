@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStart.Core", "SimpleS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStart.Auth.Firebase", "SimpleStart.FirebaseAuth.Server\SimpleStart.Auth.Firebase.csproj", "{03231F6C-76F0-4E2A-857D-5A5A69606463}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication4", "WebApplication4\WebApplication4.csproj", "{F3BEAE82-48C0-4FDE-AC50-5E283AD70707}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{03231F6C-76F0-4E2A-857D-5A5A69606463}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03231F6C-76F0-4E2A-857D-5A5A69606463}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03231F6C-76F0-4E2A-857D-5A5A69606463}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3BEAE82-48C0-4FDE-AC50-5E283AD70707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3BEAE82-48C0-4FDE-AC50-5E283AD70707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3BEAE82-48C0-4FDE-AC50-5E283AD70707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3BEAE82-48C0-4FDE-AC50-5E283AD70707}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +36,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D2659063-41C1-4BD2-8C96-0EB21F7B9968} = {5B5E327B-4C43-4198-96A7-DC0DBC409030}
 		{03231F6C-76F0-4E2A-857D-5A5A69606463} = {5B5E327B-4C43-4198-96A7-DC0DBC409030}
+		{F3BEAE82-48C0-4FDE-AC50-5E283AD70707} = {5B5E327B-4C43-4198-96A7-DC0DBC409030}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DE1DAE17-239A-48A4-BC41-C440EF626467}

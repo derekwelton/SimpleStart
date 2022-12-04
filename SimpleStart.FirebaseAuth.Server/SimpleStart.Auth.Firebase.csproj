@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
 	  <Nullable>enable</Nullable>
 	  <PackageId>SimpleStart.Auth.Firebase</PackageId>
-	  <Version>0.0.4</Version>
+	  <Version>0.0.5</Version>
 	  <Authors>Derek Welton</Authors>
 	  <RepositoryUrl>https://github.com/derekwelton/SimpleStart</RepositoryUrl>
 	  <PackageProjectUrl>https://github.com/derekwelton/SimpleStart</PackageProjectUrl>
@@ -20,7 +20,6 @@
   <ItemGroup>
 	  <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
 	  <PackageReference Include="FluentEmail.SendGrid" Version="3.0.2" />
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Abstractions" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />
   </ItemGroup>
 
@@ -28,10 +27,6 @@
 	  <Folder Include="Extensions\" />
 	  <Folder Include="Handlers\" />
 	  <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
-	  <ProjectReference Include="..\SimpleStart.Core\SimpleStart.Core.csproj" />
   </ItemGroup>
 
 </Project>

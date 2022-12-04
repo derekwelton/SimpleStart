@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SimpleStart.Core.Models;
 
 namespace SimpleStart.Core.Extensions
 {
@@ -15,11 +14,19 @@ namespace SimpleStart.Core.Extensions
         {
             return list is null || list.Count <= 0;
         }
+        public static bool IsNullOrEmpty(this Dictionary<string,object> list)
+        {
+            return list is null || list.Count <= 0;
+        }
         public static bool IsNotNullOrEmpty<T>(this List<T> list)
         {
             return !list.IsNullOrEmpty();
         }
         public static bool IsNotNullOrEmpty<T>(this HashSet<T> list)
+        {
+            return !list.IsNullOrEmpty();
+        }
+        public static bool IsNotNullOrEmpty(this Dictionary<string,object> list)
         {
             return !list.IsNullOrEmpty();
         }

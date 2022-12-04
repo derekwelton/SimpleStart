@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FirebaseAdmin;
@@ -11,8 +12,9 @@ using SimpleStart.Auth.Firebase.Models;
 
 namespace SimpleStart.Auth.Firebase.Handlers;
 
-public class FirebaseAuthenticationFunctionHandler
+public sealed class FirebaseAuthenticationFunctionHandler
 {
+    private const string AuthorizationHeader = "Authorization";
     private const string BearerPrefix = "Bearer ";
     private readonly FirebaseApp _firebaseApp;
 
@@ -24,10 +26,10 @@ public class FirebaseAuthenticationFunctionHandler
     public async Task<AuthenticateResult> HandleAuthenticateAsync(HttpContext context)
     {
         //Validate "Authorization" claim exist
-        if(context.Request.Headers.ContainsKey("Authorization") == false) return AuthenticateResult.NoResult();
+        if(context.Request.Headers.ContainsKey(AuthorizationHeader) == false) return AuthenticateResult.NoResult();
 
         //Make sure "Authorization" claim has a valid Value
-        string bearerToken = context.Request.Headers["Authorization"];
+        string bearerToken = context.Request.Headers[AuthorizationHeader]!;
         if(string.IsNullOrEmpty(bearerToken) || bearerToken.StartsWith(BearerPrefix) == false) return AuthenticateResult.Fail("Invalid Schema");
 
         string token = bearerToken.Substring(BearerPrefix.Length); //gets just the token and removes the bearer prefix
@@ -59,17 +61,6 @@ public class FirebaseAuthenticationFunctionHandler
 
     private List<Claim> CreateClaims(IReadOnlyDictionary<string, object> source)
     {
-        var claims = new List<Claim>();
-
-        foreach (var item in source)
-        {
-            if(item.Key == "user_id") claims.Add(new Claim(FirebaseUserClaimType.Id,item.Value.ToString() ?? string.Empty));
-            else if(item.Key == "email") claims.Add(new Claim(FirebaseUserClaimType.Email,item.Value.ToString() ?? string.Empty));
-            else if(item.Key == "email_verified") claims.Add(new Claim(FirebaseUserClaimType.EmailVerified,item.Value.ToString() ?? string.Empty));
-            else if(item.Key == "name") claims.Add(new Claim(FirebaseUserClaimType.Username,item.Value.ToString() ?? string.Empty));
-            else claims.Add(new Claim(item.Key,item.Value.ToString() ?? string.Empty));
-        }
-
-        return claims;
+        return source.Select(item => new Claim(item.Key, item.Value.ToString() ?? string.Empty)).ToList();
     }
 }

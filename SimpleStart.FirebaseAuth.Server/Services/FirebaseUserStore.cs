@@ -6,8 +6,6 @@ using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Options;
 using SimpleStart.Auth.Firebase.Models;
-using SimpleStart.Core.Extensions;
-using SimpleStart.Core.Models;
 
 namespace SimpleStart.Auth.Firebase.Services;
 
@@ -16,7 +14,6 @@ public class FirebaseUserStore
     private readonly FirebaseApp _firebaseApp;
     private readonly FirebaseEmailProvider _emailProvider;
     private readonly FirebaseAuthConfigOptions _firebaseConfig;
-
     private FirebaseAuth _firebaseClient => FirebaseAuth.GetAuth(_firebaseApp);
 
     public FirebaseUserStore(FirebaseApp firebaseApp, FirebaseEmailProvider emailProvider, IOptions<FirebaseAuthConfigOptions> options)
@@ -32,13 +29,13 @@ public class FirebaseUserStore
     /// <param name="adminEmail"></param>
     /// <param name="adminPassword"></param>
     /// <returns></returns>
-    public async Task<IAuthUser> TryCreateRootAdmin(string adminEmail, string adminPassword = "secretpassword")
+    public async Task<FirebaseUser> TryCreateRootAdmin(string adminEmail, string adminPassword = "secretpassword")
     {
         try
         {
             //make sure user doesn't exist already
             var authUser = await _firebaseClient.GetUserByEmailAsync(adminEmail);
-            return null;
+            return new FirebaseUser(authUser);
         }
         catch
         {
@@ -49,14 +46,16 @@ public class FirebaseUserStore
                 Password = adminPassword,
                 DisplayName = "Root Admin",
                 Disabled = false,
+                PhoneNumber = "+12345678900",
+                PhotoUrl = "http://www.example.com/12345678/photo.png"
             };
 
             var authUser = await _firebaseClient.CreateUserAsync(args);
 
             //add admin role to user
-            var roles = new List<string>();
-            roles.Add("admin");
-            await SetRoles(authUser.Uid, roles);
+            var claims = new Dictionary<string, object>();
+            claims.Add("admin",true);
+            await UpdateCustomUserClaims(authUser.Uid, claims);
 
             authUser = await _firebaseClient.GetUserByEmailAsync(adminEmail);
             return new FirebaseUser(authUser);
@@ -64,41 +63,42 @@ public class FirebaseUserStore
     }
 
     /// <summary>
-    /// replaces all the roles (replaces all the custom claims)
+    /// This will replace all custom claims. Make sure everytime this is called,
+    /// that you pass in all the existing custom claims you wish to keep.
     /// </summary>
     /// <param name="uid"></param>
     /// <param name="roles"></param>
     /// <returns></returns>
-    public Task SetRoles(string uid, List<string> roles)
+    public Task UpdateCustomUserClaims(string uid, Dictionary<string,object> claims)
     {
-        var claims = new Dictionary<string, object>();
-
-        foreach (var role in roles)
-        {
-            claims.Add(role, "true");
-        }
-
         return _firebaseClient.SetCustomUserClaimsAsync(uid, claims);
     }
+    /// <summary>
+    /// Gets all the user's custom claims.
+    /// </summary>
+    /// <param name="uid"></param>
+    /// <returns></returns>
+    public async Task<Dictionary<string, object>> GetUserCustomClaims(string uid)
+    {
+        var authUser = await GetAuthUserByIdAsync(uid);
+        return authUser!.CustomClaims;
+    }
+
 
     /// <summary>
-    /// Creates a new user in firebase auth,sets the id of IAuthUser parameter.
-    /// (optional) send a password reset email
+    /// Creates a new user in firebase auth,sets the id of IAuthUser parameter and sends an email.
     /// </summary>
     /// <param name="user"></param>
-    /// <param name="emailSubject"></param>
-    /// <param name="sendPasswordReset"></param>
     /// <returns></returns>
-    public async Task RegisterUser(IAuthUser user, bool sendPasswordReset = true)
+    /// <exception cref="Exception"></exception>
+    public async Task RegisterUserAsync(FirebaseUser user)
     {
+        if (_firebaseConfig.EmailIsOn) throw new Exception("Firebase Email Provider is not configured properly");
         var password = RandomString(12);
-        await RegisterUser(user,password);
+        await RegisterUserAsync(user,password);
 
-        if (_firebaseConfig.EmailIsOn && sendPasswordReset)
-        {
-            var passwordResetLink = await _firebaseClient.GeneratePasswordResetLinkAsync(user.Email);
-            await _emailProvider.SendRegisterPasswordResetEmail(user.Email, user.Username, passwordResetLink, _firebaseConfig.RegisterSubjectLine);
-        }
+        var passwordResetLink = await _firebaseClient.GeneratePasswordResetLinkAsync(user.Email);
+        await _emailProvider.SendRegisterPasswordResetEmail(user.Email, user.DisplayName, passwordResetLink, _firebaseConfig.RegisterSubjectLine);
     }
     /// <summary>
     /// Creates a new user in firebase auth
@@ -106,21 +106,21 @@ public class FirebaseUserStore
     /// <param name="user"></param>
     /// <param name="password"></param>
     /// <returns></returns>
-    public async Task RegisterUser(IAuthUser user, string password)
+    public async Task RegisterUserAsync(FirebaseUser user, string password)
     {
         var args = new UserRecordArgs()
         {
             Email = user.Email,
             EmailVerified = user.EmailVerified,
-            DisplayName = user.Username,
-            PhotoUrl = (string.IsNullOrEmpty(user.ProfilePic)) ? "http://www.example.com/12345678/photo.png" : user.ProfilePic,
-            Disabled = !user.Disabled
+            DisplayName = user.DisplayName,
+            PhotoUrl = (string.IsNullOrEmpty(user.PhotoUrl)) ? "http://www.example.com/12345678/photo.png" : user.PhotoUrl,
+            Disabled = !user.Disabled,
+            Password = password,
+            PhoneNumber = user.PhoneNumber
         };
 
-        args.Password = password;
-
         var authUser = await _firebaseClient.CreateUserAsync(args);
-        if (user.Roles.IsNotNullOrEmpty()) await SetRoles(authUser.Uid, user.Roles);
+        if (user.CustomClaims is {Count: > 0}) await UpdateCustomUserClaims(authUser.Uid, user.CustomClaims);
         user.Id = authUser.Uid;
     }
     /// <summary>
@@ -128,7 +128,7 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="uid"></param>
     /// <returns></returns>
-    public Task DeleteUser(string uid)
+    public Task DeleteUserAsync(string uid)
     {
         return _firebaseClient.DeleteUserAsync(uid);
     }
@@ -137,7 +137,7 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
-    public async Task<IAuthUser?> GetAuthUserByEmailAsync(string email)
+    public async Task<FirebaseUser?> GetAuthUserByEmailAsync(string email)
     {
         try
         {
@@ -155,7 +155,7 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="uid"></param>
     /// <returns></returns>
-    public async Task<IAuthUser?> GetAuthUserByIdAsync(string uid)
+    public async Task<FirebaseUser?> GetAuthUserByIdAsync(string uid)
     {
         try
         {
@@ -171,16 +171,17 @@ public class FirebaseUserStore
     /// <summary>
     /// sends password reset email to the user
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="email"></param>
+    /// <param name="displayName"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task SendPasswordReset(IAuthUser user)
+    public async Task SendPasswordResetAsync(string email, string displayName)
     {
         if (_firebaseConfig.EmailIsOn == false)
             throw new Exception("Firebase Email Provider is not configured properly");
 
-        var link = await GetPasswordResetLink(user.Email);
-        await _emailProvider.SendPasswordResetEmail(user.Email, user.Username, link,
+        var link = await GetPasswordResetLinkAsync(email);
+        await _emailProvider.SendPasswordResetEmail(email, displayName, link,
             _firebaseConfig.ResetPasswordSubjectLine);
     }
     /// <summary>
@@ -188,7 +189,7 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
-    public Task<string> GetPasswordResetLink(string email)
+    public Task<string> GetPasswordResetLinkAsync(string email)
     {
         return _firebaseClient.GeneratePasswordResetLinkAsync(email);
     }
@@ -199,7 +200,7 @@ public class FirebaseUserStore
     /// <param name="uid"></param>
     /// <param name="password"></param>
     /// <returns></returns>
-    public Task ChangePassword(string uid, string password)
+    public Task UpdatePasswordAsync(string uid, string password)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -215,7 +216,7 @@ public class FirebaseUserStore
     /// <param name="uid"></param>
     /// <param name="photoUrl"></param>
     /// <returns></returns>
-    public Task ChangePhotoUrl(string uid, string photoUrl)
+    public Task UpdatePhotoUrlAsync(string uid, string photoUrl)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -231,7 +232,7 @@ public class FirebaseUserStore
     /// <param name="uid"></param>
     /// <param name="email"></param>
     /// <returns></returns>
-    public Task ChangeEmail(string uid, string email)
+    public Task UpdateEmailAsync(string uid, string email)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -247,7 +248,7 @@ public class FirebaseUserStore
     /// <param name="uid"></param>
     /// <param name="displayName"></param>
     /// <returns></returns>
-    public Task ChangeDisplayName(string uid, string displayName)
+    public Task UpdateDisplayNameAsync(string uid, string displayName)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -263,7 +264,7 @@ public class FirebaseUserStore
     /// <param name="uid"></param>
     /// <param name="disabled"></param>
     /// <returns></returns>
-    public Task ChangeDisabled(string uid, bool disabled)
+    public Task UpdateDisabledAsync(string uid, bool disabled)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -279,7 +280,7 @@ public class FirebaseUserStore
     /// <param name="uid"></param>
     /// <param name="emailVerified"></param>
     /// <returns></returns>
-    public Task ChangeEmailVerified(string uid, bool emailVerified)
+    public Task UpdateEmailVerifiedAsync(string uid, bool emailVerified)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
@@ -294,16 +295,16 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
-    public Task UpdateUser(IAuthUser user)
+    public Task UpdateUserAsync(FirebaseUser user)
     {
         UserRecordArgs args = new UserRecordArgs()
         {
             Uid = user.Id,
             Email = user.Email,
             EmailVerified = user.EmailVerified,
-            DisplayName = user.Username,
+            DisplayName = user.DisplayName,
             Disabled = !user.Disabled,
-            PhotoUrl = user.ProfilePic
+            PhotoUrl = user.PhotoUrl,
         };
 
         return _firebaseClient.UpdateUserAsync(args);
@@ -313,7 +314,7 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public async Task<bool> IsTokenValid(string token)
+    public async Task<bool> IsTokenValidAsync(string token)
     {
         try
         {
@@ -330,7 +331,7 @@ public class FirebaseUserStore
     /// </summary>
     /// <param name="uid"></param>
     /// <returns></returns>
-    public Task RevokeAllTokens(string uid)
+    public Task RevokeAllTokensAsync(string uid)
     {
         return _firebaseClient.RevokeRefreshTokensAsync(uid);
     }
