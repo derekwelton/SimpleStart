@@ -13,7 +13,7 @@ public class FirebaseUser
     public bool Disabled { get; set; }
     public string AuthTime { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
-    public Dictionary<string, object> CustomClaims { get; internal set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> CustomClaims { get; set; } = new Dictionary<string, object>();
 
     public FirebaseUser()
     {
