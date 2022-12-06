@@ -61,6 +61,42 @@ public class FirebaseUserManager
             return new FirebaseUser(authUser);
         }
     }
+    /// <summary>
+    /// Creates the root admin if it doesn't already exist
+    /// </summary>
+    /// <param name="adminEmail"></param>
+    /// <param name="customClaims"></param>
+    /// <param name="adminPassword"></param>
+    /// <returns></returns>
+    public async Task<FirebaseUser> TryCreateRootAdmin(string adminEmail, Dictionary<string,object> customClaims, string adminPassword = "secretpassword")
+    {
+        try
+        {
+            //make sure user doesn't exist already
+            var authUser = await _firebaseClient.GetUserByEmailAsync(adminEmail);
+            return new FirebaseUser(authUser);
+        }
+        catch
+        {
+            var args = new UserRecordArgs()
+            {
+                Email = adminEmail,
+                EmailVerified = true,
+                Password = adminPassword,
+                DisplayName = "Root Admin",
+                Disabled = false,
+                PhoneNumber = "+12345678900",
+                PhotoUrl = "http://www.example.com/12345678/photo.png"
+            };
+
+            var authUser = await _firebaseClient.CreateUserAsync(args);
+
+            await UpdateCustomUserClaims(authUser.Uid, customClaims);
+
+            authUser = await _firebaseClient.GetUserByEmailAsync(adminEmail);
+            return new FirebaseUser(authUser);
+        }
+    }
 
     /// <summary>
     /// This will replace all custom claims. Make sure everytime this is called,
