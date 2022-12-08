@@ -339,7 +339,7 @@ public class FirebaseUserManager
             Email = user.Email,
             EmailVerified = user.EmailVerified,
             DisplayName = user.DisplayName,
-            Disabled = !user.Disabled,
+            Disabled = user.Disabled,
             PhotoUrl = user.PhotoUrl,
         };
 
