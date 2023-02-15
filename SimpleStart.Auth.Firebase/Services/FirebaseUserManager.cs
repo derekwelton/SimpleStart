@@ -29,7 +29,7 @@ public class FirebaseUserManager
     /// <param name="adminEmail"></param>
     /// <param name="adminPassword"></param>
     /// <returns></returns>
-    public async Task<FirebaseUser> TryCreateRootAdmin(string adminEmail, string adminPassword = "secretpassword")
+    public async Task<FirebaseUser> TryCreateRootAdmin(string adminEmail, string adminPassword = "password1234")
     {
         try
         {
@@ -47,14 +47,14 @@ public class FirebaseUserManager
                 DisplayName = "Root Admin",
                 Disabled = false,
                 PhoneNumber = "+12345678900",
-                PhotoUrl = "http://www.example.com/12345678/photo.png"
+                PhotoUrl = "https://cdn3.iconfinder.com/data/icons/user-group-3/60/employee__profile__avatar__user__man-512.png"
             };
 
             var authUser = await _firebaseClient.CreateUserAsync(args);
 
             //add admin role to user
             var claims = new Dictionary<string, object>();
-            claims.Add("admin",true);
+            claims.Add("admin", true);
             await UpdateCustomUserClaims(authUser.Uid, claims);
 
             authUser = await _firebaseClient.GetUserByEmailAsync(adminEmail);
@@ -68,7 +68,7 @@ public class FirebaseUserManager
     /// <param name="customClaims"></param>
     /// <param name="adminPassword"></param>
     /// <returns></returns>
-    public async Task<FirebaseUser> TryCreateRootAdmin(string adminEmail, Dictionary<string,object> customClaims, string adminPassword = "secretpassword")
+    public async Task<FirebaseUser> TryCreateRootAdmin(string adminEmail, Dictionary<string, object> customClaims, string adminPassword = "password1234")
     {
         try
         {
@@ -105,7 +105,7 @@ public class FirebaseUserManager
     /// <param name="uid"></param>
     /// <param name="roles"></param>
     /// <returns></returns>
-    public Task UpdateCustomUserClaims(string uid, Dictionary<string,object> claims)
+    public Task UpdateCustomUserClaims(string uid, Dictionary<string, object> claims)
     {
         return _firebaseClient.SetCustomUserClaimsAsync(uid, claims);
     }
@@ -131,7 +131,7 @@ public class FirebaseUserManager
     {
         if (_firebaseConfig.EmailIsOn) throw new Exception("Firebase Email Provider is not configured properly");
         var password = RandomString(12);
-        await RegisterUserAsync(user,password);
+        await RegisterUserAsync(user, password);
 
         var passwordResetLink = await _firebaseClient.GeneratePasswordResetLinkAsync(user.Email);
         await _emailProvider.SendRegisterPasswordResetEmail(user.Email, user.DisplayName, passwordResetLink, _firebaseConfig.RegisterSubjectLine);
@@ -149,14 +149,14 @@ public class FirebaseUserManager
             Email = user.Email,
             EmailVerified = user.EmailVerified,
             DisplayName = user.DisplayName,
-            PhotoUrl = (string.IsNullOrEmpty(user.PhotoUrl)) ? "http://www.example.com/12345678/photo.png" : user.PhotoUrl,
+            PhotoUrl = string.IsNullOrEmpty(user.PhotoUrl) ? "http://www.example.com/12345678/photo.png" : user.PhotoUrl,
             Disabled = !user.Disabled,
             Password = password,
             PhoneNumber = user.PhoneNumber
         };
 
         var authUser = await _firebaseClient.CreateUserAsync(args);
-        if (user.CustomClaims is {Count: > 0}) await UpdateCustomUserClaims(authUser.Uid, user.CustomClaims);
+        if (user.CustomClaims is { Count: > 0 }) await UpdateCustomUserClaims(authUser.Uid, user.CustomClaims);
         user.Id = authUser.Uid;
     }
     /// <summary>

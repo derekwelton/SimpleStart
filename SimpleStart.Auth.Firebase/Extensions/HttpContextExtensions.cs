@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using SimpleStart.Auth.Firebase.Models;
 
@@ -6,7 +7,7 @@ namespace SimpleStart.Auth.Firebase.Extensions;
 
 public static class HttpContextExtensions
 {
-    public static FirebaseUser GetFirebaseUser(this HttpContext httpContext)
+    public static FirebaseUser GetAuthUserFromClaims(this HttpContext httpContext)
     {
         var user = httpContext.User;
 
@@ -21,6 +22,11 @@ public static class HttpContextExtensions
             else if (claim.Type == FirebaseClaimType.PhoneNumber) firebaseUser.PhoneNumber = claim.Value;
             else if (claim.Type == FirebaseClaimType.PhotoUrl) firebaseUser.PhotoUrl = claim.Value;
             else if (claim.Type == FirebaseClaimType.AppUserId) firebaseUser.AppUserId = claim.Value;
+            else if (claim.Type == FirebaseClaimType.Role)
+            {
+                firebaseUser.Roles ??= new List<string>();
+                firebaseUser.Roles.Add(claim.Value);
+            }
             else firebaseUser.CustomClaims.Add(claim.Type,claim.Value);
         }
 

@@ -1,5 +1,6 @@
 ﻿using FirebaseAdmin;
 using FluentEmail.Core;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
@@ -58,13 +59,13 @@ public static class DependencyInjection
     private static IServiceCollection AddFirebaseServices(this IServiceCollection services)
     {
         services.AddSingleton<FirebaseUserManager>();
-        services.AddSingleton(FirebaseApp.Create());
+        AppOptions options = new AppOptions();
+        options.Credential = GoogleCredential.FromFile("./appsettings.json");
+        services.AddSingleton(FirebaseApp.Create(options));
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>(JwtBearerDefaults.AuthenticationScheme, (o) => { });
-
-        services.AddScoped<FirebaseAuthenticationFunctionHandler>();
 
         return services;
     }

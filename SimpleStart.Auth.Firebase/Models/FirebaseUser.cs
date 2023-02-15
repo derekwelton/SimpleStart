@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using FirebaseAdmin.Auth;
 
 namespace SimpleStart.Auth.Firebase.Models;
@@ -15,6 +17,7 @@ public class FirebaseUser
     public string AuthTime { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public Dictionary<string, object> CustomClaims { get; set; } = new Dictionary<string, object>();
+    public List<string> Roles { get; set; } = new List<string>();
 
     public FirebaseUser()
     {
@@ -33,7 +36,19 @@ public class FirebaseUser
 
         foreach (var customClaim in source.CustomClaims)
         {
-            this.CustomClaims.Add(customClaim.Key,customClaim.Value);
+            if (customClaim.Key == FirebaseClaimType.Role)
+            {
+                if (customClaim.Value is Newtonsoft.Json.Linq.JArray stringRoles)
+                    foreach (var role in stringRoles)
+                    {
+                        Roles.Add(role.ToString());
+                    }
+                CustomClaims.Add(FirebaseClaimType.Role, customClaim.Value.ToString() ?? string.Empty);
+            }
+            else
+            {
+                CustomClaims.Add(customClaim.Key, customClaim.Value);
+            }
         }
     }
 }

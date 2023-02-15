@@ -10,4 +10,5 @@ public static class FirebaseClaimType
     public const string PhoneNumber = "phone_number";
     public const string PhotoUrl = "picture";
     public const string AppUserId = "app_user_id";
+    public const string Role = "role";
 }

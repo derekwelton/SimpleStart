@@ -1,14 +1,21 @@
 # Simple Start Firebase Authentication
-This is a wrapper over "FirebaseAmin" but its simplified to implement for your asp net core applications.
+This is a wrapper over "FirebaseAmin" that makes it easier to implement firebase auth in your server application.
+
+## Features
+- simplifies the process to authenticate with firebase in your web api
+- supports sending emails for pasword resets and registration using Send Grid
+- Currently only supports Email Sign In. We will support other sign in providers soon!
+- supports roles in the Custom Claims
 
 ## Dependencies
 - FirebaseAdmin (the official firebase admin sdk provided by Google)
 - Fluent Email (used to send password recovery emails)
+    - NOTE: only supports sendgrid api, later we will support smtp as well.
 - Microsoft.AspNetCore.Authentication.JwtBearer (used to add authentication and dependency injection)
 
 ## Install
 ```bash
-dotnet add package SimpleStart.Auth.Firebase --version 0.0.5
+dotnet add package SimpleStart.Auth.Firebase --version 0.2.0
 ```
 
 ## Getting Started
@@ -18,26 +25,25 @@ dotnet add package SimpleStart.Auth.Firebase --version 0.0.5
 	![create_firebase_project](./images/create_firebase_project.gif)
 2. Generate a private key json file
 ![create_firebase_project](./images/get_firebase_private_key.gif)
-3. Rename file something like "firebase-config.json". This file will go in the root of your Asp net Core application
+
+#### Move private key json data into App settings
+The private key json file contains json information. Copy those fields and place them into your appsettings.json
+```json
+"type": "service_account",
+"project_id": "PROJECT ID",
+"private_key_id": "12345456",
+"private_key": "PRIVATE KEY HERE",
+"client_email": "CLIENT EMAIL",
+"client_id": "CLIENT ID",
+"auth_uri": "https://accounts.google.com/o/oauth2/auth",
+"token_uri": "https://oauth2.googleapis.com/token",
+"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+"client_x509_cert_url": "CERT URL",
+"Firebase_Api_Key": "API KEY"
+```
 
 ### Setup Asp Net Core Application
 The example below uses Minimal Apis in Dot Net 7
-
-#### Make sure you have an environment variable set in your launchsettings
-you need to add "GOOGLE_APPLICATION_CREDENTIALS": "./firebase-config.json" if the private key file is in your root.
-```json
-"myproject": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7214;http://localhost:5198",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "GOOGLE_APPLICATION_CREDENTIALS": "./firebase-config.json"
-      }
-    }
-```
 
 
 #### Setup Authentication
@@ -78,6 +84,28 @@ app.MapGet("/registerUser", async ([FromServices] FirebaseUserManager firebaseMa
 }).AllowAnonymous();
 ```
 
+#### Get AuthUser from Claims
+```csharp
+app.MapGet("/firebaseUser", async (HttpContext context) =>
+{
+    //Get a FirebaseUser from the claims
+    var authUser = context.GetAuthUserFromClaims();
+
+    Console.WriteLine(authUser.AppUserId);
+    Console.WriteLine(authUser.AuthTime);
+    Console.WriteLine(authUser.CustomClaims);
+    Console.WriteLine(authUser.Disabled);
+    Console.WriteLine(authUser.DisplayName);
+    Console.WriteLine(authUser.Email);
+    Console.WriteLine(authUser.EmailVerified);
+    Console.WriteLine(authUser.Id);
+    Console.WriteLine(authUser.PhoneNumber);
+    Console.WriteLine(authUser.PhotoUrl);
+    Console.WriteLine(authUser.Roles);
+
+}).RequireAuthorization();
+```
+
 #### Get Password Reset Link
 ```csharp
 app.MapGet("/passwordreset", async ([FromServices] FirebaseUserManager firebaseManager, string email) =>
@@ -95,7 +123,7 @@ app.MapGet("/getuser", async (HttpContext context, [FromServices] FirebaseUserMa
     var getUserByEmail = await firebaseManager.GetAuthUserByEmailAsync("user@example.com");
     var getUserById = await firebaseManager.GetAuthUserByIdAsync("abcd-1234");
 
-    var getAuthenticatedUserFromContext = context.GetFirebaseUser();
+    var getAuthenticatedUserFromContext = context.GetAuthUserFromClaims();
 
     Results.Ok();
 });
