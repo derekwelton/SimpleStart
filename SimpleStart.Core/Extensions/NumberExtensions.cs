@@ -33,5 +33,36 @@ namespace SimpleStart.Core.Extensions
         {
             return Math.Round(value, 3);
         }
+        
+        public static string ToPercentage(this double value)
+        {
+            return $"{value:P0}";
+        }
+
+        public static string ToPercentage(this double? value)
+        {
+            return value.HasValue ? $"{value:P0}" : string.Empty;
+        }
+        
+        public static string ToCurrency(this double value)
+        {
+            return $"{value:C0}";
+        }
+
+        public static string ToCurrency(this double? value)
+        {
+            return value.HasValue ? $"{value:C0}" : string.Empty;
+        }
+        
+        public static string ToCurrency(this decimal value)
+        {
+            return $"{value:C0}";
+        }
+        
+        public static string ToCurrency(this decimal? value)
+        {
+            return value.HasValue ? $"{value:C0}" : string.Empty;
+        }
+        
     }
 }

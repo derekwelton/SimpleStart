@@ -57,5 +57,45 @@ namespace SimpleStart.Core.Extensions
         {
             return dateTime >= start && dateTime <= end;
         }
+        
+        /// <summary>
+        /// Sets the kind of the DateTime to Local, it does not convert the time to local time
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime? SetKindToLocal(this DateTime? dateTime)
+        {
+            return dateTime != null ? DateTime.SpecifyKind(dateTime.Value, DateTimeKind.Local) : dateTime;
+        }
+
+        /// <summary>
+        /// Sets the kind of the DateTime to Utc, it does not convert the time to Utc time
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime? SetKindToUtc(this DateTime? dateTime)
+        {
+            return dateTime != null ? DateTime.SpecifyKind(dateTime.Value, DateTimeKind.Utc) : dateTime;
+        }
+
+        /// <summary>
+        /// Sets the kind of the DateTime to Local, it does not convert the time to local time
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime SetKindToLocal(this DateTime dateTime)
+        {
+            return DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+        }
+
+        /// <summary>
+        /// Sets the kind of the DateTime to Utc, it does not convert the time to Utc time
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime SetKindToUtc(this DateTime dateTime)
+        {
+            return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+        }
     }
 }
