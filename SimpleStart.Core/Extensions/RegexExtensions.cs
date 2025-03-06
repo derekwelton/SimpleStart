@@ -5,7 +5,7 @@ namespace SimpleStart.Core.Extensions;
 public static class RegexExtensions
 {
     private static readonly Regex WhitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
-    private static readonly Regex SpecialCharactersRegex = new Regex(@"[^a-zA-Z0-9_.]+", RegexOptions.Compiled);
+    private static readonly Regex SpecialCharactersRegex = new Regex(@"[^a-zA-Z0-9_@.]+", RegexOptions.Compiled);
     private static readonly Regex EmailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", RegexOptions.Compiled);
     private static readonly Regex PhoneNumberRegex = new Regex(@"^(\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}(;\d+)?$", RegexOptions.Compiled);
     private static readonly Regex UrlRegex = new Regex(@"^(http|https)://[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
